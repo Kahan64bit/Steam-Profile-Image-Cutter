@@ -1,0 +1,88 @@
+name: Build Binaries
+
+on:
+  push:
+    tags:
+      - "v*"          # triggers on version tags e.g. v1.0.0
+  workflow_dispatch:  # allows manual trigger from the Actions tab
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            output_name: SteamImageCutter-windows.exe
+            binary_path: dist/cutter.exe
+
+          - os: macos-latest
+            output_name: SteamImageCutter-macos
+            binary_path: dist/cutter
+
+          - os: ubuntu-latest
+            output_name: SteamImageCutter-linux
+            binary_path: dist/cutter
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install opencv-python pillow pyinstaller
+
+      - name: Build binary (Windows)
+        if: runner.os == 'Windows'
+        run: >
+          pyinstaller
+          --onefile
+          --name cutter
+          --collect-all cv2
+          cutter.py
+
+      - name: Build binary (macOS / Linux)
+        if: runner.os != 'Windows'
+        run: >
+          pyinstaller
+          --onefile
+          --name cutter
+          --collect-all cv2
+          cutter.py
+
+      - name: Rename output binary
+        shell: bash
+        run: mv "${{ matrix.binary_path }}" "${{ matrix.output_name }}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.output_name }}
+          path: ${{ matrix.output_name }}
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    # only create a release when triggered by a version tag
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Create release and upload binaries
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*
+          generate_release_notes: true
