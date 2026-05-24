@@ -68,9 +68,13 @@ Once you have your slices, upload each one to Steam Workshop using the browser c
 
 1. Go to the Steam Workshop upload page
 2. Open your browser's developer console (`F12` → Console tab)
-3. Paste and run the following line:
+   - Paste and run the following line for workshop images:
    ```js
    $J('[name=consumer_app_id]').val(480);$J('[name=file_type]').val(0);$J('[name=visibility]').val(0);
+   ```
+   - Paste and run the following line for featured artwork images:
+   ```js
+   $J('#image_width').val(1000).attr('id',''),$J('#image_height').val(1).attr('id','');
    ```
 4. Upload each slice file and note the Workshop item ID
 5. Add the IDs to your profile showcase slots in order
