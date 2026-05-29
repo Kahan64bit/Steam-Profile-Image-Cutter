@@ -1,6 +1,13 @@
 # Steam Profile Image Cutter
 
-A command-line Python tool that slices animated GIFs into Steam-ready profile showcase images — preserving full animation, frame timing, and loop settings.
+A Python tool that slices animated GIFs into Steam-ready profile showcase images — preserving full animation, frame timing, and loop settings.
+
+## Versions
+
+| Version | Interface | Notes |
+|---------|-----------|-------|
+| v1.1 | GUI + CLI | Drag-and-drop window, recommended |
+| v1.0 | CLI only | Terminal only |
 
 ## Overview
 
@@ -10,17 +17,19 @@ Two display formats are supported:
 
 | Mode | Layout | Use Case |
 |------|--------|----------|
-| `--mode 5` | Five equal slices — `155×450` each | Workshop Showcase (5-slot) |
-| `--mode 2` | Side `100×930` + Middle `506×930` | Featured Artwork / 2-slot display |
+| 5-Slice | Five equal slices — `117×338` each | Workshop Showcase (5-slot) |
+| 2-Slice | Side `100×930` + Middle `506×930` | Featured Artwork / 2-slot display |
 
 ## Requirements
 
 - Python 3.8+
 - [opencv-python](https://pypi.org/project/opencv-python/)
 - [Pillow](https://pypi.org/project/Pillow/)
+- [customtkinter](https://pypi.org/project/customtkinter/) *(v1.1 GUI only)*
+- [tkinterdnd2](https://pypi.org/project/tkinterdnd2/) *(v1.1 drag-and-drop only)*
 
 ```bash
-pip install opencv-python pillow
+pip install opencv-python pillow customtkinter tkinterdnd2
 ```
 
 ## Installation
@@ -28,16 +37,37 @@ pip install opencv-python pillow
 ```bash
 git clone https://github.com/Kahan64bit/Steam-Profile-Image-Cutter.git
 cd Steam-Profile-Image-Cutter
-pip install opencv-python pillow
+pip install opencv-python pillow customtkinter tkinterdnd2
 ```
 
+Or download the latest binary from the [Releases](https://github.com/Kahan64bit/Steam-Profile-Image-Cutter/releases) page — no Python required.
+
 ## Usage
+
+### GUI (v1.1)
+
+Run with no arguments to open the GUI:
+
+```bash
+python3 cutter.py
+```
+
+Or double-click the downloaded binary for your OS.
+
+1. Drop your `.gif` onto the drop zone or click **Browse File**
+2. Select a cut mode
+3. Optionally change the output folder
+4. Click **Slice GIF**
+
+Progress and saved file names appear in the log at the bottom.
+
+### CLI (v1.0)
 
 ```bash
 python3 cutter.py <input.gif> [output_folder] [--mode 5|2]
 ```
 
-### Examples
+**Examples:**
 
 ```bash
 # 5-slice Workshop Showcase (default)
@@ -52,12 +82,12 @@ python3 cutter.py banner.gif ./output --mode 2
 
 ### Output
 
-**Mode 5** produces five files named:
+**5-Slice** produces five files named:
 ```
 banner_slice_1.gif  banner_slice_2.gif  banner_slice_3.gif  banner_slice_4.gif  banner_slice_5.gif
 ```
 
-**Mode 2** produces two files named:
+**2-Slice** produces two files named:
 ```
 banner_side.gif   banner_middle.gif
 ```
@@ -68,11 +98,11 @@ Once you have your slices, upload each one to Steam Workshop using the browser c
 
 1. Go to the Steam Workshop upload page
 2. Open your browser's developer console (`F12` → Console tab)
-   - Paste and run the following line for workshop images:
+3. Paste and run the following line for **Workshop Showcase** images:
    ```js
    $J('[name=consumer_app_id]').val(480);$J('[name=file_type]').val(0);$J('[name=visibility]').val(0);
    ```
-   - Paste and run the following line for featured artwork images:
+   Or for **Featured Artwork** images:
    ```js
    $J('#image_width').val(1000).attr('id',''),$J('#image_height').val(1).attr('id','');
    ```
